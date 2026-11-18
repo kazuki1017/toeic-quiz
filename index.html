@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOEIC リーディング練習帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e4e2dc;
+  --accent:#3b4cca;--accent-soft:#e8eafb;
+  --good:#1f8a5b;--good-soft:#e2f4ea;--mid:#b7791f;--mid-soft:#fbf0dc;--bad:#c2410c;--bad-soft:#fde7dc;
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#141416;--card:#1e1e22;--ink:#ececef;--sub:#9c9ca3;--line:#2e2e34;
+  --accent:#8b97ff;--accent-soft:#272b4d;--good:#4fc28c;--good-soft:#173527;--mid:#e0a84a;--mid-soft:#3a2e17;--bad:#ff8a5c;--bad-soft:#3d2219;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:20px;margin:4px 0 2px}
+h2{font-size:15px;margin:24px 0 10px;color:var(--sub);font-weight:500}
+.muted{color:var(--sub);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.row{display:flex;gap:10px;align-items:center}
+.btn{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 14px;font:inherit;font-weight:500;cursor:pointer;text-align:center}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.block{display:block;width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;line-height:1.2}
+.stat span{font-size:12px;color:var(--sub)}
+.grid{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:6px;align-items:stretch}
+.gh{font-size:12px;color:var(--sub);text-align:center;padding-bottom:2px}
+.gh small{display:block;font-size:10px}
+.gl{font-size:13px;font-weight:500;display:flex;align-items:center;background:none;border:none;color:var(--ink);padding:0;font-family:inherit;text-align:left;cursor:pointer}
+.cell{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-family:inherit;color:var(--ink)}
+.cell b{display:block;font-size:16px}
+.cell span{font-size:11px;color:var(--sub)}
+.cell.good{background:var(--good-soft);border-color:transparent}.cell.good b{color:var(--good)}
+.cell.mid{background:var(--mid-soft);border-color:transparent}.cell.mid b{color:var(--mid)}
+.cell.bad{background:var(--bad-soft);border-color:transparent}.cell.bad b{color:var(--bad)}
+.bars .bar{margin:10px 0}
+.bar .top{display:flex;justify-content:space-between;font-size:13px}
+.track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:4px}
+.fill{height:100%;border-radius:4px}
+.weak{background:var(--bad-soft);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:14px;margin-top:12px}
+.weak b{color:var(--bad)}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--sub);margin-top:8px;flex-wrap:wrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+/* quiz */
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.x{border:none;background:none;font-size:22px;color:var(--sub);cursor:pointer;padding:4px 8px}
+.prog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.prog div{height:100%;background:var(--accent)}
+.tag{display:inline-block;font-size:12px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 10px;margin-bottom:10px}
+.passage{white-space:pre-line;font-size:14px;background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-family:Georgia,"Noto Sans JP",serif;line-height:1.65}
+.qtext{font-size:17px;margin:0 0 14px;font-family:Georgia,"Noto Sans JP",serif}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;cursor:pointer;font-family:Georgia,"Noto Sans JP",serif}
+.opt .l{font-weight:700;color:var(--sub);font-family:"Noto Sans JP",sans-serif}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.ng{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.expl{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:14px}
+.expl.ok{background:var(--good-soft)}.expl.ng{background:var(--bad-soft)}
+.expl b{display:block;margin-bottom:4px}
+.big{font-size:44px;font-weight:700;text-align:center;margin:8px 0 0}
+.wlist{margin:0;padding:0;list-style:none}
+.wlist li{border-top:1px solid var(--line);padding:10px 0;font-size:13px}
+.wlist li:first-child{border-top:none}
+.sync{font-size:11px;color:var(--sub)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal .card{max-width:360px;width:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="modal"></div>
+<script>
+const CATS={pos:"品詞",verb:"動詞の形",prep:"前置詞・接続詞",pron:"代名詞・関係詞",vocab:"語彙",read:"長文読解"};
+const CAT_SUB={pos:"Part 5",verb:"Part 5",prep:"Part 5",pron:"Part 5",vocab:"Part 5",read:"Part 7"};
+const LV={1:"初級",2:"中級",3:"上級"};
+const LV_SUB={1:"〜500点",2:"〜700点",3:"730点〜"};
+const P={
+p1:"Green Leaf Café\nNotice to Customers\n\nStarting May 1, Green Leaf Café will open at 7:00 A.M. instead of 8:00 A.M. on weekdays. Our weekend hours will not change. We will also start offering a breakfast set for $6. Thank you for your continued support!",
+p2:"Ken Mori (9:12 A.M.)\nHi Lisa, I'm stuck in traffic. I'll be about 20 minutes late for the meeting.\n\nLisa Grant (9:14 A.M.)\nNo problem. I'll tell the client. Do you have the sales charts?\n\nKen Mori (9:15 A.M.)\nYes, they're on my laptop. I'll set them up when I arrive.",
+p3:"FOR RENT\n\nTwo-bedroom apartment, 5 minutes' walk from Sakae Station. Monthly rent: 95,000 yen (utilities not included). Pets are not allowed. Available from June 1. Call 052-555-0123 to arrange a viewing.",
+p4:"To: All Employees\nFrom: Human Resources\nSubject: Annual Health Checkup\n\nThis year's health checkups will take place from October 5 to October 9 in Conference Room B. Each employee has been assigned a time slot, which you can find on the company intranet. If you cannot attend your assigned time, please contact Ms. Yamada in Human Resources by September 30 to reschedule. Employees who miss their checkup will need to arrange one at a local clinic at their own expense.",
+p5:"Riverside City Library Expands Hours\n\nRiverside City Library announced on Monday that it will extend its evening hours starting next month. The library will now stay open until 9:00 P.M. Monday through Thursday, two hours later than before. According to library director Sarah Klein, the change is a response to a survey in which many residents said they could not visit during the day because of work. The extended hours will be funded by a grant from a local business association.",
+p6:"Amy Chen [2:03 P.M.]\nHas anyone heard back from Brightway Printing about the brochures?\n\nTom Ellis [2:05 P.M.]\nThey called this morning. The paper we ordered is out of stock.\n\nAmy Chen [2:06 P.M.]\nThat's a problem. The trade show is next Tuesday.\n\nTom Ellis [2:07 P.M.]\nThey suggested a similar paper that's available now. It's slightly more expensive, though.\n\nAmy Chen [2:08 P.M.]\nLet's go with it. Meeting the deadline is more important.",
+p7:"Dear Mr. Okada,\n\nThank you for your interest in the Senior Analyst position at Harlow Consulting. We were impressed by your background in market research. However, after careful consideration, we have decided to proceed with candidates whose experience more closely matches the requirements of the role, particularly in financial modeling.\n\nThat said, we will be opening a Market Research Specialist position in our Nagoya office early next year, and we believe your skills would be an excellent fit. With your permission, we would like to keep your résumé on file and contact you when the position is posted.\n\nSincerely,\nKaren Holt\nRecruiting Manager",
+p8:"Tanaka Foods to Close Shizuoka Plant\n\nTanaka Foods announced yesterday that it will close its Shizuoka plant by the end of the year and move production to a newly built facility in Hamamatsu. The company said the 40-year-old Shizuoka plant would require costly repairs to meet updated safety standards. Most of the plant's 120 workers will be offered positions at the Hamamatsu facility, which is about 80 kilometers away. Those who choose not to relocate will receive support in finding new jobs. The company expects the new facility to increase its overall production capacity by 30 percent.",
+p9:"To: customer.service@deskpro.com\nFrom: m.sato@nagoya-design.jp\nSubject: Order #48213\n\nHello,\n\nI received my order of ten office chairs yesterday. Unfortunately, three of them are black, although I ordered all ten in gray. The remaining seven are correct. Since our new office opens on the 20th, I would appreciate it if the replacement chairs could arrive before then. Please also let me know how I should return the black chairs. I would prefer not to pay any return shipping costs, as the error was not on our side.\n\nBest regards,\nMiho Sato\nNagoya Design Studio"
+};
+const RAW=[
+// ===== 品詞 =====
+["pos1-1","pos",1,"Please read the instructions ------- before using the machine.",["careful","carefully","care","careless"],1,"「read the instructions（動詞＋目的語）」の後ろで動詞を修飾するのは副詞 carefully。"],
+["pos1-2","pos",1,"The hotel offers a ------- view of the ocean.",["beauty","beautify","beautiful","beautifully"],2,"冠詞 a と名詞 view の間 → 名詞を修飾する形容詞 beautiful。"],
+["pos1-3","pos",1,"Mr. Lee made an important ------- at the meeting.",["announce","announcement","announced","announcing"],1,"「an ＋ 形容詞 ＋ ___」の形なので名詞が入る。make an announcement＝発表する。"],
+["pos1-4","pos",1,"Our sales increased ------- last quarter.",["significant","significance","significantly","signify"],2,"自動詞 increased を修飾するのは副詞 significantly（大幅に）。"],
+["pos1-5","pos",1,"The new software is very ------- for small businesses.",["use","useful","usefully","usefulness"],1,"「be動詞 ＋ very ＋ ___」→ 補語になる形容詞 useful。"],
+["pos1-6","pos",1,"All employees must attend the safety ------- on Monday.",["train","trained","training","trainer"],2,"attend（出席する）の目的語は「研修」。safety training で「安全研修」という複合名詞。trainer（人）には出席できない。"],
+["pos1-7","pos",1,"The manager spoke ------- about the company's future.",["confident","confidently","confidence","confide"],1,"動詞 spoke を修飾するのは副詞 confidently（自信を持って）。"],
+["pos1-8","pos",1,"Customer ------- is our top priority.",["satisfy","satisfied","satisfaction","satisfying"],2,"文の主語になるのは名詞。customer satisfaction＝顧客満足。"],
+["pos2-1","pos",2,"The proposal was ------- approved by the board of directors.",["unanimous","unanimously","unanimity","unanimousness"],1,"「be動詞 ＋ ___ ＋ 過去分詞」の間に入るのは副詞。unanimously＝満場一致で。"],
+["pos2-2","pos",2,"Ms. Garcia is known for her ------- to detail.",["attend","attentive","attention","attentively"],2,"所有格 her の後ろは名詞。attention to detail＝細部への気配り（頻出表現）。"],
+["pos2-3","pos",2,"The factory has become more ------- since the new system was installed.",["produce","productive","productively","production"],1,"become の補語で、more に続くのは形容詞 productive（生産的な）。"],
+["pos2-4","pos",2,"The company's ------- growth surprised many analysts.",["rapid","rapidly","rapidity","rapids"],0,"所有格と名詞 growth の間 → 形容詞 rapid。"],
+["pos2-5","pos",2,"Applicants should have ------- communication skills.",["except","exception","exceptional","exceptionally"],2,"名詞 communication skills を修飾する形容詞 exceptional（非常に優れた）。"],
+["pos2-6","pos",2,"The museum is ------- located near the central station.",["convenient","conveniently","convenience","conveniences"],1,"「be ＋ ___ ＋ 過去分詞 located」→ 副詞。conveniently located＝便利な場所にある（頻出）。"],
+["pos2-7","pos",2,"We appreciate your ------- in this matter.",["cooperate","cooperative","cooperation","cooperatively"],2,"所有格 your の後ろは名詞 cooperation（協力）。"],
+["pos2-8","pos",2,"The results of the survey were ------- different from what we expected.",["consider","considerable","considerably","consideration"],2,"形容詞 different を修飾するのは副詞 considerably（かなり）。considerable は形容詞なので形容詞を修飾できない。"],
+["pos3-1","pos",3,"The CEO's speech was ------- received by shareholders.",["favor","favorable","favorably","favorite"],2,"受動態 was received の間に入るのは副詞 favorably（好意的に）。"],
+["pos3-2","pos",3,"Due to an ------- in demand, the factory hired additional staff.",["increase","increased","increasingly","increasing"],0,"「an ___ in ～」の形 → 名詞 increase。an increase in demand＝需要の増加。"],
+["pos3-3","pos",3,"The board found the consultant's recommendations highly -------.",["persuade","persuasive","persuasively","persuasion"],1,"find O C（OをCだと思う）のC → 形容詞。highly は副詞なので、後ろは形容詞 persuasive（説得力のある）。"],
+["pos3-4","pos",3,"Only ------- staff are permitted to enter the laboratory.",["authorize","authorized","authorization","authorizing"],1,"名詞 staff を修飾。スタッフは「許可される」側なので過去分詞 authorized（許可された）。"],
+["pos3-5","pos",3,"The firm is seeking a ------- for its new branch in Osaka.",["represent","representative","representation","represented"],1,"冠詞 a の後ろで「人材を探す」意味になる名詞 representative（担当者・代表者）。"],
+["pos3-6","pos",3,"Mr. Kim responded to the complaint ------- and professionally.",["prompt","promptly","promptness","prompted"],1,"and で副詞 professionally と並列 → 同じ副詞の promptly（迅速に）。"],
+["pos3-7","pos",3,"The ------- of the new policy will take several months.",["implement","implemented","implementation","implementing"],2,"「The ___ of ～」→ 名詞 implementation（実施）。"],
+["pos3-8","pos",3,"Although the instructions were complex, the assembly process was ------- simple.",["surprise","surprised","surprising","surprisingly"],3,"形容詞 simple を修飾するのは副詞 surprisingly（意外にも）。"],
+// ===== 動詞の形 =====
+["verb1-1","verb",1,"Ms. Ito ------- to Tokyo last week.",["travel","travels","traveled","will travel"],2,"last week（先週）があるので過去形 traveled。"],
+["verb1-2","verb",1,"The store ------- at 10 A.M. every day.",["open","opens","opening","to open"],1,"every day（習慣）なので現在形。主語が三人称単数なので opens。"],
+["verb1-3","verb",1,"We ------- the meeting tomorrow afternoon.",["held","will hold","have held","holding"],1,"tomorrow があるので未来形 will hold。"],
+["verb1-4","verb",1,"The package was ------- yesterday.",["deliver","delivers","delivering","delivered"],3,"荷物は「配達される」側。was ＋ 過去分詞の受動態。"],
+["verb1-5","verb",1,"Mr. Brown is ------- a report right now.",["write","writes","writing","written"],2,"right now（今まさに）＋ is → 現在進行形 is writing。"],
+["verb1-6","verb",1,"I look forward to ------- you next week.",["see","seeing","seen","saw"],1,"look forward to の to は前置詞なので、後ろは動名詞 seeing。超頻出。"],
+["verb1-7","verb",1,"Employees need ------- their ID cards at all times.",["carry","carrying","to carry","carried"],2,"need to do＝～する必要がある。"],
+["verb1-8","verb",1,"The new office ------- built in 2020.",["is","was","has","were"],1,"2020年（過去）の受動態。主語は単数なので was。"],
+["verb2-1","verb",2,"Ms. Park ------- for this company since 2018.",["works","worked","has worked","is working"],2,"since 2018（2018年から今まで）→ 現在完了 has worked。"],
+["verb2-2","verb",2,"If it rains tomorrow, the picnic ------- postponed.",["is","was","will be","would be"],2,"条件を表す if 節は現在形でも、主節は未来のことなので will be。"],
+["verb2-3","verb",2,"The report must ------- by noon.",["finish","be finished","finishing","have finish"],1,"レポートは「仕上げられる」側 → 助動詞＋be＋過去分詞。"],
+["verb2-4","verb",2,"The documents ------- on your desk were sent by the legal department.",["leave","left","leaving","to leave"],1,"書類は「置かれた」もの → 過去分詞 left が後ろから名詞を修飾。文の動詞は were sent。"],
+["verb2-5","verb",2,"The company decided ------- its headquarters to Osaka.",["move","moving","to move","moved"],2,"decide は to不定詞をとる動詞。decide to do。"],
+["verb2-6","verb",2,"By the time the client arrived, the presentation ------- already started.",["has","had","have","was"],1,"顧客が到着した（過去）時点より前に始まっていた → 過去完了 had started。"],
+["verb2-7","verb",2,"The manager had his assistant ------- the files.",["organize","organized","to organize","organizing"],0,"使役 have ＋ 人 ＋ 動詞の原形（人に～させる）。"],
+["verb2-8","verb",2,"Visitors are requested ------- their bags at the entrance.",["leave","to leave","leaving","left"],1,"request 人 to do の受動態 → be requested to do。"],
+["verb3-1","verb",3,"It is essential that every participant ------- the form before the seminar.",["completes","complete","completed","will complete"],1,"It is essential that ～ の that 節では動詞は原形（仮定法現在）。三単現の s は付かない。"],
+["verb3-2","verb",3,"Had we known about the delay, we ------- the schedule.",["changed","will change","would have changed","have changed"],2,"Had we known ＝ If we had known（倒置の仮定法過去完了）→ 主節は would have ＋ 過去分詞。"],
+["verb3-3","verb",3,"------- the report, Ms. Chen sent it to her supervisor.",["Finish","Finished","Having finished","To have finished"],2,"レポートを仕上げた後に送った → 完了形の分詞構文 Having finished。"],
+["verb3-4","verb",3,"By next March, Mr. Ford ------- at the firm for ten years.",["works","has worked","will have worked","had worked"],2,"By next March（未来のある時点まで）＋ for ten years → 未来完了 will have worked。"],
+["verb3-5","verb",3,"The marketing team is considering ------- the launch date.",["postpone","to postpone","postponing","postponed"],2,"consider は動名詞をとる動詞。consider doing。"],
+["verb3-6","verb",3,"Mr. Davis objected to ------- to work on weekends.",["ask","be asked","being asked","asking"],2,"object to の to は前置詞 → 動名詞。さらに彼は「頼まれる」側なので受け身の being asked。"],
+["verb3-7","verb",3,"The contract ------- by both parties before the project can begin.",["must sign","must be signed","must signing","must have sign"],1,"契約書は「署名される」側 → must be signed。"],
+["verb3-8","verb",3,"The CEO recommended that the budget ------- reviewed again.",["is","be","was","will be"],1,"recommend that ～ の that 節は動詞の原形（仮定法現在）→ be reviewed。"],
+// ===== 前置詞・接続詞 =====
+["prep1-1","prep",1,"The meeting will start ------- 3 P.M.",["in","on","at","by"],2,"時刻の前は at。"],
+["prep1-2","prep",1,"The report is due ------- Friday.",["at","on","in","to"],1,"曜日の前は on。"],
+["prep1-3","prep",1,"I was late ------- the train was delayed.",["because","because of","despite","during"],0,"後ろに主語＋動詞（the train was delayed）→ 接続詞 because。because of は後ろが名詞。"],
+["prep1-4","prep",1,"Please stay quiet ------- the presentation.",["while","during","when","since"],1,"後ろが名詞（the presentation）だけ → 前置詞 during。while は接続詞。"],
+["prep1-5","prep",1,"Mr. Lopez was born ------- 1990.",["on","at","in","to"],2,"年の前は in。"],
+["prep1-6","prep",1,"The office is closed ------- Saturdays and Sundays.",["in","on","at","for"],1,"曜日の前は on（複数形で「毎週～」）。"],
+["prep1-7","prep",1,"We can meet on Tuesday ------- Wednesday.",["but","or","so","because"],1,"火曜「か」水曜 → or。"],
+["prep1-8","prep",1,"The game was canceled ------- the heavy snow.",["because","because of","although","so"],1,"後ろが名詞（the heavy snow）→ because of。"],
+["prep2-1","prep",2,"------- the price was high, many customers bought the product.",["Despite","Although","Because of","In spite of"],1,"後ろに主語＋動詞 → 接続詞 Although。Despite / In spite of は前置詞で後ろは名詞。"],
+["prep2-2","prep",2,"Please finish the report ------- Friday.",["until","by","since","during"],1,"by＝期限（金曜までに）。until＝継続（金曜までずっと）。finish は1回で終わる動作なので by。"],
+["prep2-3","prep",2,"The store will remain open ------- 9 P.M.",["by","until","at","within"],1,"remain open（開いたまま）は継続 → until。"],
+["prep2-4","prep",2,"------- you have any questions, please contact us.",["If","Unless","Despite","Whether"],0,"「質問があれば連絡を」→ If。Unless は「～しない限り」で意味が逆。"],
+["prep2-5","prep",2,"The shipment arrived ------- two days of the order.",["within","during","between","among"],0,"within ＋ 期間 of ～＝～から…以内に。"],
+["prep2-6","prep",2,"Ms. Wang will lead the project ------- Mr. Sato is on leave.",["during","while","for","since"],1,"後ろに主語＋動詞（Mr. Sato is）→ 接続詞 while。during は前置詞。"],
+["prep2-7","prep",2,"Both the manager ------- her assistant attended the conference.",["or","nor","and","but"],2,"both A and B（AもBも）。"],
+["prep2-8","prep",2,"------- its small size, the camera takes high-quality photos.",["Although","Despite","Even though","Because"],1,"後ろが名詞（its small size）→ 前置詞 Despite。他は全部接続詞。"],
+["prep3-1","prep",3,"------- the merger is approved, the two firms will combine their operations.",["Once","Despite","During","Regardless"],0,"後ろが主語＋動詞 → 接続詞。Once＝いったん～すれば。Despite / During は前置詞、Regardless は of が必要。"],
+["prep3-2","prep",3,"The event will be held outdoors ------- it rains.",["unless","if","because","so that"],0,"「雨が降らない限り屋外で開催」→ unless。if では「雨なら屋外」になり不自然。"],
+["prep3-3","prep",3,"Neither the director ------- the staff were informed of the change.",["or","and","nor","but"],2,"neither A nor B（AもBも～ない）。"],
+["prep3-4","prep",3,"The company offers free shipping ------- orders over 5,000 yen.",["on","at","in","to"],0,"free shipping on orders＝注文に対する送料無料。対象を表す on。"],
+["prep3-5","prep",3,"------- the new system was installed, productivity has risen sharply.",["Since","For","During","After"],0,"主節が現在完了（has risen）→「～以来」の Since。For / During は前置詞。"],
+["prep3-6","prep",3,"Employees may work from home ------- they complete their tasks on time.",["as long as","in case of","in spite of","owing to"],0,"後ろに主語＋動詞 → 接続詞の as long as（～する限り）。他3つは後ろに名詞をとる。"],
+["prep3-7","prep",3,"------- its popularity, the restaurant often requires reservations weeks in advance.",["Although","Due to","Even if","Whereas"],1,"後ろが名詞（its popularity）＋ 理由の意味 → Due to（～のため）。"],
+["prep3-8","prep",3,"The sales team exceeded its target, ------- the marketing team fell short.",["whereas","because of","so that","despite"],0,"2つの文を対比でつなぐ接続詞 whereas（一方で）。"],
+// ===== 代名詞・関係詞 =====
+["pron1-1","pron",1,"Ms. Kato left ------- umbrella in the meeting room.",["she","her","hers","herself"],1,"名詞 umbrella の前 → 所有格 her。"],
+["pron1-2","pron",1,"Mr. Tanaka and I will present the plan. Please contact ------- if you have questions.",["we","our","us","ours"],2,"動詞 contact の目的語 → 目的格 us。"],
+["pron1-3","pron",1,"This desk is mine, and that one is -------.",["your","you","yours","yourself"],2,"「あなたのもの」→ 所有代名詞 yours。"],
+["pron1-4","pron",1,"The woman ------- is standing by the door is our new manager.",["who","which","whose","what"],0,"先行詞が人（the woman）で、後ろに主語がない → 主格の who。"],
+["pron1-5","pron",1,"The company ------- I work for is in Nagoya.",["who","which","whose","what"],1,"先行詞がもの（the company）→ which。work for の目的語が抜けている。"],
+["pron1-6","pron",1,"Mr. Ross fixed the printer -------.",["he","him","his","himself"],3,"「自分で」→ 再帰代名詞 himself。"],
+["pron1-7","pron",1,"The employees finished ------- work early today.",["they","their","them","theirs"],1,"名詞 work の前 → 所有格 their。"],
+["pron1-8","pron",1,"This is the book ------- I told you about.",["who","which","where","whose"],1,"先行詞がもの（the book）で、about の目的語が抜けている → which。"],
+["pron2-1","pron",2,"The manager ------- office is on the fifth floor will interview you.",["who","whom","whose","which"],2,"「そのマネージャーの事務所」→ 所有格の関係代名詞 whose ＋ 名詞。"],
+["pron2-2","pron",2,"Ms. Lee completed the project by -------.",["she","her","hers","herself"],3,"by oneself＝独力で。"],
+["pron2-3","pron",2,"This is the hotel ------- we stayed last year.",["which","where","who","whose"],1,"we stayed（完全な文）が続き、場所が先行詞 → 関係副詞 where。stay は自動詞なので which は不可（which ... at なら可）。"],
+["pron2-4","pron",2,"The price of this model is lower than ------- of the old one.",["it","that","this","those"],1,"the price の繰り返しを避ける that（単数）。"],
+["pron2-5","pron",2,"------- who wish to attend the seminar should register online.",["They","Those","These","Them"],1,"Those who ～＝～する人々（定型表現）。"],
+["pron2-6","pron",2,"We will hire ------- is most qualified for the position.",["whoever","whomever","whatever","whichever"],0,"空欄は is の主語で人 → 主格の whoever（～する人は誰でも）。"],
+["pron2-7","pron",2,"The staff members, most of ------- are new, need training.",["them","whom","who","which"],1,"前置詞 of の後ろで人を受ける関係代名詞 → whom。them だと文が2つになり接続詞が足りない。"],
+["pron2-8","pron",2,"Mr. Hill gave a presentation ------- impressed the clients.",["who","what","which","whose"],2,"先行詞がもの（a presentation）で主語が抜けている → which。"],
+["pron3-1","pron",3,"------- the committee decides will be announced on Monday.",["That","What","Which","Who"],1,"「委員会が決めること」→ 先行詞を含む What。decides の目的語が抜けている。"],
+["pron3-2","pron",3,"The reason ------- the event was canceled has not been explained.",["which","why","where","what"],1,"the reason ＋ why ＋ 完全な文（理由の関係副詞）。"],
+["pron3-3","pron",3,"Sales figures for this year are higher than ------- for last year.",["that","those","it","them"],1,"複数形 sales figures の繰り返し → those。"],
+["pron3-4","pron",3,"Please give the documents to ------- is at the reception desk.",["whoever","whomever","who","whom"],0,"空欄は is の主語 → 主格 whoever。前置詞 to の後ろでも、節の中での役割で格が決まる。"],
+["pron3-5","pron",3,"The conference, ------- was held in Kyoto, attracted 500 participants.",["that","which","where","what"],1,"カンマの後（非制限用法）では that は使えない → which。"],
+["pron3-6","pron",3,"The building, the roof ------- was damaged in the storm, is being repaired.",["of which","of whom","which","whose"],0,"the roof of the building → the roof of which。whose なら「whose roof」の語順になる。"],
+["pron3-7","pron",3,"Any employee ------- wishes to take leave must notify a supervisor in advance.",["who","whom","whose","which"],0,"先行詞が人で wishes の主語が抜けている → 主格 who。"],
+["pron3-8","pron",3,"Of the two proposals, the board preferred ------- submitted by Ms. Chan.",["the one","it","one","them"],0,"特定の「陳さんが出したほう」→ the one（＝the proposal）。"],
+// ===== 語彙 =====
+["vocab1-1","vocab",1,"Please ------- the form and return it to the front desk.",["fill out","give up","look for","turn off"],0,"fill out the form＝用紙に記入する。"],
+["vocab1-2","vocab",1,"The flight was ------- because of bad weather.",["canceled","joined","invited","ordered"],0,"悪天候でフライトが「欠航になった」→ canceled。"],
+["vocab1-3","vocab",1,"Our store has a wide ------- of products.",["selection","direction","reception","election"],0,"a wide selection of ～＝幅広い品ぞろえ。"],
+["vocab1-4","vocab",1,"Please ------- the lights when you leave the room.",["turn on","turn off","put on","take off"],1,"部屋を出るときは電気を「消す」→ turn off。"],
+["vocab1-5","vocab",1,"The ------- for job applications is next Friday.",["deadline","headline","guideline","online"],0,"deadline＝締め切り。"],
+["vocab1-6","vocab",1,"Mr. Hayashi will ------- the conference on behalf of our company.",["attend","arrive","reach","go"],0,"attend＋目的語で「出席する」。arrive は at、go は to が必要。reach は「到着する」で意味が合わない。"],
+["vocab1-7","vocab",1,"The restaurant is ------- for its seafood dishes.",["famous","busy","ready","full"],0,"be famous for ～＝～で有名だ。"],
+["vocab1-8","vocab",1,"Please make a ------- if you want to stay at the hotel.",["reservation","conversation","donation","location"],0,"make a reservation＝予約する。"],
+["vocab2-1","vocab",2,"The company plans to ------- its product line next year.",["expand","explain","expect","expire"],0,"expand＝拡大する。expire は「期限が切れる」。"],
+["vocab2-2","vocab",2,"All visitors must ------- with the safety rules.",["comply","obey","follow","observe"],0,"後ろに with があるので comply（comply with＝従う）。obey / follow / observe は with なしで目的語をとる。"],
+["vocab2-3","vocab",2,"The new manager has ------- experience in marketing.",["extensive","expensive","exclusive","expressive"],0,"extensive experience＝豊富な経験。expensive（高価な）と混同注意。"],
+["vocab2-4","vocab",2,"Please ------- the attached file for more details.",["refer to","depend on","consist of","apply for"],0,"refer to ～＝～を参照する。"],
+["vocab2-5","vocab",2,"The concert was ------- due to the singer's illness.",["postponed","promoted","proposed","produced"],0,"postpone＝延期する。"],
+["vocab2-6","vocab",2,"Ms. Ruiz is ------- for managing the budget.",["responsible","capable","available","possible"],0,"be responsible for ～＝～を担当している。capable は of をとる。"],
+["vocab2-7","vocab",2,"Customers can ------- a full refund within 30 days.",["request","respond","reply","remain"],0,"request a refund＝返金を求める。respond / reply は to が必要。"],
+["vocab2-8","vocab",2,"The warranty ------- repairs for up to two years.",["covers","holds","keeps","takes"],0,"保証が修理を「対象とする・カバーする」→ cover。"],
+["vocab3-1","vocab",3,"The board decided to ------- the proposal until more data is available.",["defer","differ","refer","infer"],0,"defer＝延期する（＝postpone）。differ は「異なる」、infer は「推測する」。"],
+["vocab3-2","vocab",3,"The new policy will be ------- to all employees, regardless of position.",["applicable","eligible","capable","reliable"],0,"be applicable to ～＝～に適用される。eligible は for、capable は of をとる。"],
+["vocab3-3","vocab",3,"Employees who work overtime are ------- for additional pay.",["eligible","entitled","capable","dependent"],0,"be eligible for ～＝～の資格がある。entitled は to をとる（be entitled to）。"],
+["vocab3-4","vocab",3,"The factory had to ------- production due to a shortage of parts.",["suspend","suspect","suspense","sustain"],0,"suspend＝一時停止する。sustain は「維持する」で文脈と逆。"],
+["vocab3-5","vocab",3,"Ms. Novak was ------- to the position of regional director.",["promoted","proceeded","provided","prevented"],0,"be promoted to ～＝～に昇進する。"],
+["vocab3-6","vocab",3,"The survey results will be ------- in next month's newsletter.",["published","punished","polished","purchased"],0,"publish＝掲載する・発表する。"],
+["vocab3-7","vocab",3,"Please ------- the receipt as proof of purchase.",["retain","remain","restrain","refrain"],0,"retain＝保持する（＝keep）。remain は自動詞、refrain は from をとる。"],
+["vocab3-8","vocab",3,"The company's profits have increased ------- over the past five years.",["steadily","closely","nearly","shortly"],0,"increase steadily＝着実に増える。shortly は「まもなく」。"],
+// ===== 長文読解 =====
+["read1-1","read",1,"What is changing at the café?",["Its weekday opening time","Its weekend hours","Its location","Its menu prices"],0,"「平日は8時ではなく7時に開店」とある。週末は変わらない（will not change）。","p1"],
+["read1-2","read",1,"What will the café start doing?",["Closing on weekends","Offering a breakfast set","Delivering food","Hiring new staff"],1,"「start offering a breakfast set for $6」とある。","p1"],
+["read1-3","read",1,"Why will Mr. Mori be late?",["He is in heavy traffic.","His train is delayed.","He forgot his laptop.","He has another meeting."],0,"「I'm stuck in traffic」＝渋滞にはまっている。","p2"],
+["read1-4","read",1,"What will Mr. Mori do when he arrives?",["Call the client","Set up the sales charts","Print some documents","Book a meeting room"],1,"「I'll set them up when I arrive」の them は sales charts。","p2"],
+["read1-5","read",1,"What is true about the apartment?",["It is near a station.","Pets are welcome.","Utilities are included.","It is available now."],0,"「5 minutes' walk from Sakae Station」。ペット不可、光熱費別、6月1日から。","p3"],
+["read1-6","read",1,"How can people see the apartment?",["By visiting an office","By sending an e-mail","By making a phone call","By attending an open house"],2,"「Call 052-555-0123 to arrange a viewing」→ 電話する。","p3"],
+["read2-1","read",2,"Where can employees find their assigned time slot?",["In this e-mail","On the company intranet","From their manager","In Conference Room B"],1,"「which you can find on the company intranet」とある。","p4"],
+["read2-2","read",2,"What will happen to employees who miss their checkup?",["They will be rescheduled automatically.","They must pay for a checkup elsewhere.","They will receive a warning.","They will lose a vacation day."],1,"「arrange one at a local clinic at their own expense」＝自費で地元の診療所で受ける。","p4"],
+["read2-3","read",2,"Why is the library extending its hours?",["It has added more books.","Residents asked for it in a survey.","It is being renovated.","A new director was hired."],1,"「a response to a survey」＝日中は仕事で来られないという住民アンケートへの対応。","p5"],
+["read2-4","read",2,"How will the change be paid for?",["By higher membership fees","By a city tax","By a grant from a business association","By donations from residents"],2,"最後の文「funded by a grant from a local business association」。","p5"],
+["read2-5","read",2,"What problem is mentioned?",["A printer is broken.","The ordered paper is unavailable.","The trade show was canceled.","The brochures contain errors."],1,"「The paper we ordered is out of stock」＝在庫切れ。","p6"],
+["read2-6","read",2,"At 2:08 P.M., what does Ms. Chen most likely mean when she writes, \"Let's go with it\"?",["She wants to cancel the order.","She agrees to use the alternative paper.","She will attend the trade show.","She will look for another printer."],1,"直前で「少し高いが似た紙ならある」と言われ、「締め切りの方が大事」と続けている → 代替の紙で進めることに同意。意図問題は前後の流れで判断する。","p6"],
+["read3-1","read",3,"Why was Mr. Okada not selected for the position?",["He applied after the deadline.","He lacked experience in financial modeling.","He requested a high salary.","He was unavailable for an interview."],1,"「particularly in financial modeling」→ その分野の経験がより合う候補者を選んだ。","p7"],
+["read3-2","read",3,"What does Ms. Holt ask Mr. Okada for?",["An updated résumé","Permission to keep his résumé","A list of references","A visit to the Nagoya office"],1,"「With your permission, we would like to keep your résumé on file」。","p7"],
+["read3-3","read",3,"What is indicated about Harlow Consulting?",["It has an office in Nagoya.","It is planning a merger.","It recently hired Mr. Okada.","It specializes in financial software."],0,"「a ... position in our Nagoya office」→ 名古屋に事務所がある。indicated 問題は本文の言い換えを探す。","p7"],
+["read3-4","read",3,"Why is the Shizuoka plant closing?",["Sales have declined.","It needs expensive repairs.","Workers went on strike.","Its lease is ending."],1,"「would require costly repairs to meet updated safety standards」。","p8"],
+["read3-5","read",3,"What will workers who do not relocate receive?",["A special bonus","Help finding new jobs","Part-time positions","Training in Hamamatsu"],1,"「receive support in finding new jobs」＝再就職の支援。","p8"],
+["read3-6","read",3,"What is NOT mentioned about the new facility?",["Where it is located","How far it is from Shizuoka","How much it cost to build","How it will affect production capacity"],2,"場所（浜松）、距離（約80km）、生産能力（30%増）は書かれているが、建設費はない。NOT問題は選択肢を1つずつ本文と照合する。","p8"],
+["read3-7","read",3,"Why did Ms. Sato write the e-mail?",["To cancel an order","To report incorrect items","To ask about a price","To order more chairs"],1,"10脚のうち3脚が注文と違う色（黒）だったことを報告している。","p9"],
+["read3-8","read",3,"How many chairs were delivered in the wrong color?",["Three","Seven","Ten","Twenty"],0,"「three of them are black」。20は開業日（the 20th）なのでひっかけ。","p9"],
+["read3-9","read",3,"What does Ms. Sato imply?",["She wants a refund for all the chairs.","DeskPro should pay the return shipping.","Her office opening has been delayed.","She prefers black chairs."],1,"「the error was not on our side」→ ミスは御社側なので返送料は負担してほしい、という含み。","p9"]
+];
+const QS=RAW.map(r=>({id:r[0],cat:r[1],lv:r[2],q:r[3],o:r[4],a:r[5],e:r[6],p:r[7]||null}));
+const QMAP=Object.fromEntries(QS.map(q=>[q.id,q]));
+
+// ---------- state ----------
+const KEY="toeic-reading-progress-v1";
+let prog={};
+try{prog=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){prog={}}
+let sync="local",dbRef=null,saveTimer=null,writing=false,dirty=false;
+let view="home",session=null,lvFilter=0;
+
+function record(id,ok){const r=prog[id]||{n:0,c:0,l:0};r.n++;if(ok)r.c++;r.l=ok?1:0;prog[id]=r;save();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(prog))}catch(e){}if(!dbRef)return;dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,800);}
+async function flush(){if(writing||!dirty||!dbRef)return;writing=true;dirty=false;try{await dbRef.set({p:prog,t:Date.now()});setSync("cloud")}catch(e){setSync("err")}writing=false;if(dirty)flush();}
+function setSync(s){sync=s;const el=document.getElementById("sync");if(el)el.textContent=syncText();}
+function syncText(){return sync==="cloud"?"☁ 記録はアカウントに保存されています":sync==="err"?"⚠ 保存に失敗しました（この端末には保存済み）":"記録はこの端末に保存されています";}
+function merge(a,b){const out={...a};for(const k in b){if(!out[k]||(b[k].n||0)>(out[k].n||0))out[k]=b[k]}return out;}
+
+(async()=>{
+  try{
+    if(!window.claude||typeof window.claude.use!=="function")return;
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db||!user)return;
+    const uid=await user.id();
+    if(!uid)return;
+    const ref=db.collection("data/users/"+uid).doc("progress");
+    const snap=await Promise.race([ref.get(),new Promise((_,rej)=>setTimeout(()=>rej("timeout"),10000))]);
+    let d=snap&&typeof snap.data==="function"?snap.data():snap;
+    if(d&&d.data&&d.data.p)d=d.data;
+    const before=JSON.stringify(prog);
+    if(d&&d.p)prog=merge(prog,d.p);
+    dbRef=ref;setSync("cloud");
+    try{localStorage.setItem(KEY,JSON.stringify(prog))}catch(e){}
+    if(!d||!d.p||JSON.stringify(d.p)!==JSON.stringify(prog)){if(Object.keys(prog).length){dirty=true;flush();}}
+    if(view==="home"&&before!==JSON.stringify(prog))render();
+  }catch(e){setSync("local")}
+})();
+
+// ---------- stats ----------
+function agg(filter){let n=0,c=0,done=0,total=0;for(const q of QS){if(!filter(q))continue;total++;const r=prog[q.id];if(r&&r.n){n+=r.n;c+=r.c;done++}}return{n,c,done,total,pct:n?Math.round(c/n*100):null};}
+function wrongIds(){return QS.filter(q=>prog[q.id]&&prog[q.id].n&&prog[q.id].l===0).map(q=>q.id);}
+function cls(p){return p==null?"":p>=80?"good":p>=60?"mid":"bad";}
+function color(p){return p==null?"var(--line)":p>=80?"var(--good)":p>=60?"var(--mid)":"var(--bad)";}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+// ---------- session ----------
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a;}
+function order(list){const groups={};const keys=[];for(const q of list){const k=q.p||q.id;if(!groups[k]){groups[k]=[];keys.push(k)}groups[k].push(q)}return shuffle(keys).flatMap(k=>groups[k]).map(q=>({...q,perm:shuffle([0,1,2,3])}));}
+function start(list,label,mode){if(!list.length)return;session={list:order(list),i:0,picked:null,results:[],label,mode};view="quiz";render();window.scrollTo(0,0);}
+function startCell(cat,lv){start(QS.filter(q=>q.cat===cat&&(!lv||q.lv===lv)),CATS[cat]+(lv?"・"+LV[lv]:"・全レベル"),"normal");}
+function startRandom(){const pool=QS.filter(q=>!lvFilter||q.lv===lvFilter);start(shuffle(pool).slice(0,20),"ランダム20問"+(lvFilter?"・"+LV[lvFilter]:""),"normal");}
+function startReview(){start(wrongIds().map(id=>QMAP[id]),"間違えた問題の復習","review");}
+function pick(i){if(!session||session.picked!=null)return;const q=session.list[session.i];session.picked=i;const ok=i===q.a;record(q.id,ok);session.results.push({id:q.id,ok});render();}
+function next(){session.i++;session.picked=null;if(session.i>=session.list.length){view="result"}render();window.scrollTo(0,0);}
+function home(){view="home";session=null;render();window.scrollTo(0,0);}
+
+// ---------- render ----------
+function render(){
+  const app=document.getElementById("app");
+  if(view==="home")app.innerHTML=renderHome();
+  else if(view==="quiz")app.innerHTML=renderQuiz();
+  else app.innerHTML=renderResult();
+}
+function renderHome(){
+  const all=agg(()=>true);const w=wrongIds().length;
+  const catStats=Object.keys(CATS).map(k=>({k,...agg(q=>q.cat===k)}));
+  const tried=catStats.filter(s=>s.n>=3).sort((a,b)=>a.pct-b.pct);
+  const weak=tried.length&&tried[0].pct<80?tried[0]:null;
+  let weakLv=null;
+  if(weak){const lvs=[1,2,3].map(l=>({l,...agg(q=>q.cat===weak.k&&q.lv===l)})).filter(s=>s.n>=2).sort((a,b)=>a.pct-b.pct);if(lvs.length)weakLv=lvs[0];}
+  let h=`<h1>TOEIC リーディング練習帳</h1><div class="muted">Part 5・Part 7 ／ 全${QS.length}問</div>
+  <div class="card" style="margin-top:14px">
+    <div class="stats3">
+      <div class="stat"><b>${all.pct==null?"–":all.pct+"%"}</b><span>正答率</span></div>
+      <div class="stat"><b>${all.done}<small style="font-size:13px;color:var(--sub)">/${all.total}</small></b><span>解いた問題</span></div>
+      <div class="stat"><b style="color:${w?"var(--bad)":"inherit"}">${w}</b><span>復習待ち</span></div>
+    </div>
+    <button class="btn primary block" onclick="startReview()" ${w?"":"disabled"}>${w?`間違えた問題を復習する（${w}問）`:"復習待ちの問題はありません"}</button>
+    ${weak?`<div class="weak">いちばんの苦手は <b>${CATS[weak.k]}</b>（正答率 ${weak.pct}%）${weakLv?`。特に<b>${LV[weakLv.l]}</b>が ${weakLv.pct}% です`:""}。<div style="margin-top:8px"><button class="btn block" onclick="startCell('${weak.k}',${weakLv?weakLv.l:0})">この分野を練習する</button></div></div>`:""}
+  </div>
+  <h2>分野 × レベル（タップで開始）</h2>
+  <div class="card">
+    <div class="grid">
+      <div></div>${[1,2,3].map(l=>`<div class="gh">${LV[l]}<small>${LV_SUB[l]}</small></div>`).join("")}
+      ${Object.keys(CATS).map(k=>`<button class="gl" onclick="startCell('${k}',0)">${CATS[k]}<span class="muted" style="font-size:10px;margin-left:4px">${CAT_SUB[k]}</span></button>`+[1,2,3].map(l=>{const s=agg(q=>q.cat===k&&q.lv===l);return `<button class="cell ${cls(s.pct)}" onclick="startCell('${k}',${l})"><b>${s.pct==null?"–":s.pct+"%"}</b><span>${s.done}/${s.total}問</span></button>`}).join("")).join("")}
+    </div>
+    <div class="legend"><span><i class="dot" style="background:var(--good)"></i>80%以上</span><span><i class="dot" style="background:var(--mid)"></i>60〜79%</span><span><i class="dot" style="background:var(--bad)"></i>60%未満</span><span>分野名タップで全レベル</span></div>
+  </div>
+  <h2>分野別の正答率（苦手順）</h2>
+  <div class="card bars">
+    ${catStats.slice().sort((a,b)=>(a.pct==null?101:a.pct)-(b.pct==null?101:b.pct)).map(s=>`<div class="bar"><div class="top"><span>${CATS[s.k]}</span><span class="muted">${s.pct==null?"未回答":`${s.pct}%（${s.c}/${s.n}回）`}</span></div><div class="track"><div class="fill" style="width:${s.pct||0}%;background:${color(s.pct)}"></div></div></div>`).join("")}
+    <div style="display:flex;gap:16px;margin-top:14px">${[1,2,3].map(l=>{const s=agg(q=>q.lv===l);return `<div style="flex:1;text-align:center"><div class="muted">${LV[l]}</div><b style="color:${color(s.pct)}">${s.pct==null?"–":s.pct+"%"}</b></div>`}).join("")}</div>
+  </div>
+  <h2>ミックス練習</h2>
+  <div class="card">
+    <div class="muted">レベル</div>
+    <div class="chips">${[0,1,2,3].map(l=>`<button class="chip ${lvFilter===l?"on":""}" onclick="lvFilter=${l};render()">${l?LV[l]:"すべて"}</button>`).join("")}</div>
+    <button class="btn block" onclick="startRandom()">全分野からランダム20問</button>
+  </div>
+  <div style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <span class="sync" id="sync">${syncText()}</span>
+    <button class="btn" style="font-size:12px;padding:8px 12px" onclick="askReset()">記録をリセット</button>
+  </div>`;
+  return h;
+}
+function renderQuiz(){
+  const s=session,q=s.list[s.i],L="ABCD";const done=s.picked!=null;const ok=done&&s.picked===q.a;
+  return `<div class="qtop"><button class="x" onclick="home()" aria-label="やめる">✕</button><div class="prog"><div style="width:${(s.i+(done?1:0))/s.list.length*100}%"></div></div><span class="muted">${s.i+1}/${s.list.length}</span></div>
+  <div class="tag">${CATS[q.cat]}・${LV[q.lv]}</div>
+  ${q.p?`<div class="passage">${esc(P[q.p])}</div>`:""}
+  <p class="qtext">${esc(q.q)}</p>
+  <div class="opts">${q.perm.map((i,pos)=>{const o=q.o[i];let c="";if(done){if(i===q.a)c="ok";else if(i===s.picked)c="ng"}return `<button class="opt ${c}" onclick="pick(${i})" ${done?"disabled":""}><span class="l">(${L[pos]})</span><span>${esc(o)}</span></button>`}).join("")}</div>
+  ${done?`<div class="expl ${ok?"ok":"ng"}"><b>${ok?"正解！":"不正解 … 正解は ("+L[q.perm.indexOf(q.a)]+") "+esc(q.o[q.a])}</b>${esc(q.e)}</div>
+  <button class="btn primary block" style="margin-top:14px" onclick="next()">${s.i+1<s.list.length?"次へ":"結果を見る"}</button>`:""}`;
+}
+function renderResult(){
+  const s=session;const c=s.results.filter(r=>r.ok).length;const n=s.results.length;const pct=n?Math.round(c/n*100):0;
+  const wrong=s.results.filter(r=>!r.ok).map(r=>QMAP[r.id]);
+  const left=wrongIds().length;
+  return `<h1>${esc(s.label)}</h1>
+  <div class="card" style="margin-top:12px;text-align:center"><div class="big" style="color:${color(pct)}">${pct}%</div><div class="muted">${n}問中 ${c}問正解</div>
+  ${s.mode==="review"?`<div class="muted" style="margin-top:6px">正解した問題は復習リストから外れました。残り ${left}問</div>`:""}</div>
+  ${wrong.length?`<h2>間違えた問題</h2><div class="card"><ul class="wlist">${wrong.map(q=>`<li><span class="tag" style="margin:0 0 4px">${CATS[q.cat]}・${LV[q.lv]}</span><div>${esc(q.q)}</div><div class="muted">正解：${esc(q.o[q.a])}</div></li>`).join("")}</ul></div>
+  <button class="btn primary block" style="margin-top:14px" onclick="start(session.results.filter(r=>!r.ok).map(r=>QMAP[r.id]),'今回間違えた問題','review')">今回間違えた問題をもう一度</button>`:`<p style="text-align:center">全問正解です 🎉</p>`}
+  <button class="btn block" style="margin-top:10px" onclick="home()">ホームに戻る</button>`;
+}
+function askReset(){document.getElementById("modal").innerHTML=`<div class="modal" onclick="if(event.target===this)closeModal()"><div class="card"><b>記録をリセットしますか？</b><p class="muted">正答率と復習リストがすべて消えます。元に戻せません。</p><div class="row"><button class="btn" style="flex:1" onclick="closeModal()">やめる</button><button class="btn primary" style="flex:1;background:var(--bad);border-color:var(--bad)" onclick="doReset()">リセット</button></div></div></div>`;}
+function closeModal(){document.getElementById("modal").innerHTML="";}
+function doReset(){prog={};save();closeModal();render();}
+render();
+</script>
+</body>
+</html>
