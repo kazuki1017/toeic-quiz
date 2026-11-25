@@ -259,7 +259,7 @@ try{prog=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){prog={}}
 let sync="local",dbRef=null,saveTimer=null,writing=false,dirty=false;
 let view="home",session=null,lvFilter=0;
 
-function record(id,ok){const r=prog[id]||{n:0,c:0,l:0};r.n++;if(ok)r.c++;r.l=ok?1:0;prog[id]=r;save();}
+function record(id,ok){const r=prog[id]||{n:0,c:0,l:0};r.n++;if(ok)r.c++;r.l=ok?1:0;r.rc=ok?1:0;prog[id]=r;save();}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(prog))}catch(e){}if(!dbRef)return;dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,800);}
 async function flush(){if(writing||!dirty||!dbRef)return;writing=true;dirty=false;try{await dbRef.set({p:prog,t:Date.now()});setSync("cloud")}catch(e){setSync("err")}writing=false;if(dirty)flush();}
 function setSync(s){sync=s;const el=document.getElementById("sync");if(el)el.textContent=syncText();}
@@ -298,7 +298,9 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function order(list){const groups={};const keys=[];for(const q of list){const k=q.p||q.id;if(!groups[k]){groups[k]=[];keys.push(k)}groups[k].push(q)}return shuffle(keys).flatMap(k=>groups[k]).map(q=>({...q,perm:shuffle([0,1,2,3])}));}
 function start(list,label,mode){if(!list.length)return;session={list:order(list),i:0,picked:null,results:[],label,mode};view="quiz";render();window.scrollTo(0,0);}
 function startCell(cat,lv){start(QS.filter(q=>q.cat===cat&&(!lv||q.lv===lv)),CATS[cat]+(lv?"・"+LV[lv]:"・全レベル"),"normal");}
-function startRandom(){const pool=QS.filter(q=>!lvFilter||q.lv===lvFilter);start(shuffle(pool).slice(0,20),"ランダム20問"+(lvFilter?"・"+LV[lvFilter]:""),"normal");}
+function randPool(){return QS.filter(q=>(!lvFilter||q.lv===lvFilter)&&!(prog[q.id]&&prog[q.id].rc));}
+function startRandom(){const pool=randPool();if(!pool.length)return;start(shuffle(pool).slice(0,20),"ランダム"+Math.min(20,pool.length)+"問"+(lvFilter?"・"+LV[lvFilter]:""),"normal");}
+function resetCycle(){for(const q of QS){if((!lvFilter||q.lv===lvFilter)&&prog[q.id])prog[q.id].rc=0}save();render();}
 function startReview(){start(wrongIds().map(id=>QMAP[id]),"間違えた問題の復習","review");}
 function pick(i){if(!session||session.picked!=null)return;const q=session.list[session.i];session.picked=i;const ok=i===q.a;record(q.id,ok);session.results.push({id:q.id,ok});render();}
 function next(){session.i++;session.picked=null;if(session.i>=session.list.length){view="result"}render();window.scrollTo(0,0);}
@@ -345,7 +347,7 @@ function renderHome(){
   <div class="card">
     <div class="muted">レベル</div>
     <div class="chips">${[0,1,2,3].map(l=>`<button class="chip ${lvFilter===l?"on":""}" onclick="lvFilter=${l};render()">${l?LV[l]:"すべて"}</button>`).join("")}</div>
-    <button class="btn block" onclick="startRandom()">全分野からランダム20問</button>
+    ${(()=>{const tot=QS.filter(q=>!lvFilter||q.lv===lvFilter).length;const left=randPool().length;return left?`<div class="muted" style="margin-bottom:8px">まだ正解していない問題 ${left}/${tot}問から出題します。正解した問題は全問正解するまで出ません。</div><button class="btn block" onclick="startRandom()">全分野からランダム${Math.min(20,left)}問</button>`:`<div class="weak" style="background:var(--good-soft);margin-top:0">この範囲の${tot}問をすべて正解しました 🎉</div><button class="btn block" style="margin-top:10px" onclick="resetCycle()">もう一周する（最初から出題）</button>`})()}
   </div>
   <div style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:10px">
     <span class="sync" id="sync">${syncText()}</span>
