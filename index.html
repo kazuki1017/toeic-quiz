@@ -76,6 +76,9 @@ h2{font-size:15px;margin:24px 0 10px;color:var(--sub);font-weight:500}
 .sync{font-size:11px;color:var(--sub)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
 .modal .card{max-width:360px;width:100%}
+.kbd-only{display:none}
+@media (hover:hover) and (pointer:fine){.kbd-only{display:block}.opt .l{min-width:2.2em}}
+kbd{font-family:inherit;font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--card)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
 .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -483,6 +486,7 @@ function renderQuiz(){
   ${q.p?`<div class="passage">${esc(P[q.p])}</div>`:""}
   <p class="qtext">${esc(q.q)}</p>
   <div class="opts">${q.perm.map((i,pos)=>{const o=q.o[i];let c="";if(done){if(i===q.a)c="ok";else if(i===s.picked)c="ng"}return `<button class="opt ${c}" onclick="pick(${i})" ${done?"disabled":""}><span class="l">(${L[pos]})</span><span>${esc(o)}</span></button>`}).join("")}</div>
+  <div class="kbd-only muted" style="font-size:12px;margin-top:10px"><kbd>A</kbd>〜<kbd>D</kbd> で回答 ／ <kbd>Enter</kbd> で次へ ／ <kbd>Esc</kbd> でやめる</div>
   ${done?`<div class="expl ${ok?"ok":"ng"}"><b>${ok?"正解！":"不正解 … 正解は ("+L[q.perm.indexOf(q.a)]+") "+esc(q.o[q.a])}</b>${esc(q.e)}</div>
   <button class="btn primary block" style="margin-top:14px" onclick="next()">${s.i+1<s.list.length?"次へ":"結果を見る"}</button>`:""}`;
 }
@@ -500,6 +504,16 @@ function renderResult(){
 function askReset(){document.getElementById("modal").innerHTML=`<div class="modal" onclick="if(event.target===this)closeModal()"><div class="card"><b>記録をリセットしますか？</b><p class="muted">正答率と復習リストがすべて消えます。元に戻せません。</p><div class="row"><button class="btn" style="flex:1" onclick="closeModal()">やめる</button><button class="btn primary" style="flex:1;background:var(--bad);border-color:var(--bad)" onclick="doReset()">リセット</button></div></div></div>`;}
 function closeModal(){document.getElementById("modal").innerHTML="";}
 function doReset(){prog={};save();closeModal();render();}
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
+  if(document.getElementById("modal").innerHTML)return;
+  if(view!=="quiz"||!session)return;
+  const k=e.key.toLowerCase();const idx="abcd".indexOf(k);
+  const q=session.list[session.i];
+  if(idx>=0&&k.length===1&&session.picked==null){e.preventDefault();pick(q.perm[idx]);}
+  else if((e.key==="Enter"||e.key===" ")&&session.picked!=null){e.preventDefault();next();}
+  else if(e.key==="Escape"){e.preventDefault();home();}
+});
 render();
 </script>
 </body>
